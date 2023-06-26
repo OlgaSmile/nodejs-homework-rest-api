@@ -1,15 +1,14 @@
-const Contact = require('../models/contact')
+const {listContacts, getContactById, addContact, updateContact, removeContact} = require('../models/contacts');
 const {HttpError, ctrlWrapper} = require('../helpers');
 
   const getAll = async (req, res, next) => {
-      const result = await Contact.find();
+      const result = await listContacts();
       res.json(result);
   }
 
   const getById = async (req, res, next) => {
       const id = req.params.contactId
-      // const result = await Contact.findOne({_id: id});
-      const result = await Contact.findById(id);
+      const result = await getContactById(id);
       if(!result){
         throw HttpError(404, `Contact with id "${id}" is not found`)
       }
@@ -18,7 +17,7 @@ const {HttpError, ctrlWrapper} = require('../helpers');
 
   const deleteById = async (req, res, next) => {
       const id = req.params.contactId;
-      const result = await Contact.findByIdAndDelete(id);
+      const result = await removeContact(id);
   
       if(!result){
         throw HttpError(404, `Contact with id "${id}" is not found`)
@@ -27,13 +26,13 @@ const {HttpError, ctrlWrapper} = require('../helpers');
   }
 
   const add = async (req, res, next) => {
-      const result = await Contact.create(req.body);
+      const result = await addContact(req.body);
       res.status(201).json(result)
   }
 
   const updateById = async (req, res, next) => {
       const id = req.params.contactId;
-      const result = await Contact.findByIdAndUpdate(id, req.body, {new:true});
+      const result = await updateContact(id, req.body);
   
       if(!result){
         throw HttpError(404, `Contact with id "${id}" is not found`)
@@ -41,21 +40,10 @@ const {HttpError, ctrlWrapper} = require('../helpers');
       res.json(result);
   }
 
-  const updateFavorite = async(req, res, next) =>{
-    const id = req.params.contactId;
-    const result = await Contact.findByIdAndUpdate(id, req.body, {new:true});
-
-    if(!result){
-      throw HttpError(404, `Contact with id "${id}" is not found`)
-    }
-    res.json(result);
-  }
-
   module.exports = {
     getAll: ctrlWrapper(getAll),
     getById: ctrlWrapper(getById),
     deleteById: ctrlWrapper(deleteById),
     add: ctrlWrapper(add),
-    updateById: ctrlWrapper(updateById),
-    updateFavorite: ctrlWrapper(updateFavorite)
+    updateById: ctrlWrapper(updateById)
   }
