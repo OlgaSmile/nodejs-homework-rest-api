@@ -2,7 +2,7 @@ const {Schema, model} = require('mongoose');
 
 const {handleMongooseError} = require('../middlewares')
 
-const userSubscr = require('../constants/users')
+const {userSubscr} = require('../constants/users')
 
 const userSchema = new Schema({
     password: {
@@ -17,7 +17,7 @@ const userSchema = new Schema({
     subscription: {
       type: String,
       enum: userSubscr,
-      default: "starter"
+      default: "starter",
     },
     token: String
 }, {versionKey: false, timestamps: true})
