@@ -1,10 +1,11 @@
 const express = require('express');
 const { getAll, getById, deleteById, add, updateById, updateFavorite } = require('../../controllers/contacts');
-const {validateBody, isValidId} = require('../../middlewares');
+const {validateBody, isValidId, authenticate} = require('../../middlewares');
 const schemas = require('../../schemas');
 
 const router = express.Router();
 
+router.use(authenticate)
 
 router.get('/', getAll)
 
