@@ -5,7 +5,7 @@ const {userSubscr} = require('../constants/users');
 const userRegisterSchema = Joi.object({
     password: Joi.string().required(),
     email: Joi.string().required(),
-    subscription: Joi.string().tag(...userSubscr).default('starter')
+    subscription: Joi.string().valid(...userSubscr).default('starter')
 });
 
 const userLogInSchema = Joi.object({
@@ -13,5 +13,9 @@ const userLogInSchema = Joi.object({
     email: Joi.string().required(),
 });
 
+const userSubsciptSchema = Joi.object({
+    subscription: Joi.string().valid(...userSubscr).required()
+})
 
-module.exports= {userRegisterSchema, userLogInSchema};
+
+module.exports= {userRegisterSchema, userLogInSchema, userSubsciptSchema};

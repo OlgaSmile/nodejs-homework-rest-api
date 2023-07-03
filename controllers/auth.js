@@ -58,9 +58,23 @@ const logout = async (req, res)=>{
     res.status(204).json({message: "Logout success"})
 }
 
+const updateSubscription = async (req, res) =>{
+    const {_id} = req.user;
+    const newSubscr = req.body.subscription;
+    const presentSubscr = req.user.subscription;
+    if(newSubscr===presentSubscr){
+        throw HttpError(409, `You had already get ${newSubscr} subscription`);
+    }
+
+    const result = await User.findByIdAndUpdate(_id, {subscription: newSubscr}, {new:true})
+
+    res.status(201).json(result)
+}
+
 module.exports = {
     signup : ctrlWrapper(signup),
     signin: ctrlWrapper(signin),
     getCurrent: ctrlWrapper(getCurrent),
-    logout: ctrlWrapper(logout)
+    logout: ctrlWrapper(logout),
+    updateSubscription: ctrlWrapper(updateSubscription)
 }

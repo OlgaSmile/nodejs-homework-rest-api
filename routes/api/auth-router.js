@@ -1,8 +1,8 @@
 const express = require('express');
 
-const {signup, signin, getCurrent, logout} = require('../../controllers/auth')
+const {signup, signin, getCurrent, logout, updateSubscription} = require('../../controllers/auth')
 
-const {userRegisterSchema, userLogInSchema} = require('../../schemas');
+const {userRegisterSchema, userLogInSchema, userSubsciptSchema} = require('../../schemas');
 
 const {validateBody} = require('../../middlewares')
 
@@ -16,6 +16,8 @@ router.post('/signin', validateBody(userLogInSchema), signin);
 
 router. get('/current', authenticate, getCurrent);
 
-router.post('/logout', authenticate, logout)
+router.post('/logout', authenticate, logout);
+
+router.patch('/subscription', authenticate, validateBody(userSubsciptSchema), updateSubscription)
 
 module.exports = router;
