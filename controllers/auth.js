@@ -1,9 +1,14 @@
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
+const fs = require('fs').promises;
+const path = require('path');
+const gravatar = require('gravatar');
 
 const User = require('../models/user');
 
-const {HttpError, ctrlWrapper} = require('../helpers');
+const {HttpError, ctrlWrapper, changeImg} = require('../helpers');
+
+const usersDir = path.resolve('public', 'avatars')
 
 const {SECRET_KEY} = process.env;
 
@@ -13,10 +18,20 @@ const signup = async (req, res) =>{
     if(user){
         throw HttpError(409, "Email already in use")
     }
+    let avatarURL = gravatar.url(email);
+    if(req.file){
+        const {_id} = req.user;
+        const {path:oldPath, originalname} = req.file;
+        await changeImg(oldPath);
+    const newName = `${_id}_${originalname}`;
+    const newPath = path.join(usersDir, newName);
+    fs.rename(oldPath, newPath);
+
+    avatarURL = path.join( "avatars", newName)}
 
     const hashPassword = await bcrypt.hash(password, 10)
 
-    const newUser = await User.create({...req.body, password: hashPassword});
+    const newUser = await User.create({...req.body, avatarURL, password: hashPassword});
 
     res.status(201).json({
         email: newUser.email,
@@ -71,10 +86,27 @@ const updateSubscription = async (req, res) =>{
     res.status(201).json(result)
 }
 
+const updateAvatar = async (req, res) =>{
+    const {_id} = req.user;
+    const {path:oldPath, originalname} = req.file;
+
+    await changeImg(oldPath);
+    const newName = `${_id}_${originalname}`;
+    const newPath = path.join(usersDir, newName);
+    fs.rename(oldPath, newPath);
+
+    const newAvatarURL = path.join( "avatars", newName);
+
+    const result = await User.findByIdAndUpdate(_id, {avatarURL: newAvatarURL}, {new:true})
+
+    res.status(201).json(result)
+}
+
 module.exports = {
     signup : ctrlWrapper(signup),
     signin: ctrlWrapper(signin),
     getCurrent: ctrlWrapper(getCurrent),
     logout: ctrlWrapper(logout),
-    updateSubscription: ctrlWrapper(updateSubscription)
+    updateSubscription: ctrlWrapper(updateSubscription),
+    updateAvatar: ctrlWrapper(updateAvatar)
 }
