@@ -19,6 +19,7 @@ const userSchema = new Schema({
       enum: userSubscr,
       default: "starter",
     },
+    avatarURL: String,
     token: String
 }, {versionKey: false, timestamps: true})
 
