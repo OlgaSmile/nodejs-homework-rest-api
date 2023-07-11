@@ -17,5 +17,9 @@ const userSubsciptSchema = Joi.object({
     subscription: Joi.string().valid(...userSubscr).required()
 })
 
+const userEmailSchema = Joi.object({
+    email: Joi.string().required(),
+})
 
-module.exports= {userRegisterSchema, userLogInSchema, userSubsciptSchema};
+
+module.exports= {userRegisterSchema, userLogInSchema, userSubsciptSchema, userEmailSchema};
