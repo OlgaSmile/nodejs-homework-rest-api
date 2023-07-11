@@ -53,8 +53,35 @@ const verify = async (req, res) =>{
     const {verificationToken} = req.params;
     const user = await User.findOne({verificationToken})
     if(!user){
-        throw HttpError(401)
+        throw HttpError(404, 'User not found')
     }
+
+    await User.findByIdAndUpdate(user._id, {verify: true, verificationToken:''})
+
+    res.json({
+        message: "Verification successful"
+    })
+}
+
+const resendVerify = async (req, res)=>{
+    const {email} = req.body;
+    const user = await User.findOne({email});
+    if(!user){
+        throw HttpError(404, 'User not found')
+    }
+    if(user.verify){
+        throw HttpError(400, "Verification has already been passed")
+    }
+    const verifyEmail ={
+        to: email,
+        subject: "Verify email",
+        html: `<a target="_blank" href="${BASE_URL}/api/auth/verify/${user.verificationToken}" >Click to verify email</a>`
+    } 
+    await emailSend(verifyEmail); 
+
+    res.json({
+        message: "Verification email sent"
+    })      
 }
 
 const signin = async (req, res)=>{
@@ -131,5 +158,6 @@ module.exports = {
     logout: ctrlWrapper(logout),
     updateSubscription: ctrlWrapper(updateSubscription),
     updateAvatar: ctrlWrapper(updateAvatar),
-    verify: ctrlWrapper(verify)
+    verify: ctrlWrapper(verify),
+    resendVerify: ctrlWrapper(resendVerify)
 }
